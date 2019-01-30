@@ -1,12 +1,12 @@
 package de.elite.games.dilbert;
 
-public class ImageInfo {
+class ImageInfo {
 
     private final String src;
     private final int width;
     private final int height;
 
-    ImageInfo(String src, int width, int height) {
+    ImageInfo(final String src, final int width, final int height) {
         this.src = src;
         this.width = width;
         this.height = height;

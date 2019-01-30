@@ -31,6 +31,7 @@ public class App extends Application {
     private static final int ERROR_MSG_Y = 100;
     private static final String PREV = "<-";
     private static final String NEXT = "->";
+    private static final String WINDOW_TITLE = "Dilbert WebComic Viewer";
     private final DatePicker datePicker = new DatePicker();
     private final Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -40,9 +41,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle(WINDOW_TITLE);
 
-        datePicker.setOnAction(event -> updateImage(getUrlDateSuffix(datePicker.getValue())));
+        datePicker.setOnAction(event -> drawSelected(getUrlDateSuffix(datePicker.getValue())));
         datePicker.setValue(LocalDate.now());
         datePicker.fireEvent(new ActionEvent());
 
@@ -63,37 +64,53 @@ public class App extends Application {
     }
 
     private void changeDate(final boolean isForwardInTime) {
-        LocalDate localDate = datePicker.getValue();
+        LocalDate selectedDate = datePicker.getValue();
         LocalDate now = LocalDate.now();
         if (isForwardInTime) {
-            if (!localDate.plusDays(1).isAfter(now)) {//no comics of future
-                datePicker.setValue(localDate.plusDays(1));
+            if (!selectedDate.plusDays(1).isAfter(now)) {//no comics of future
+                datePicker.setValue(selectedDate.plusDays(1));
             }
         } else {
-            datePicker.setValue(localDate.minusDays(1));
+            datePicker.setValue(selectedDate.minusDays(1));
         }
     }
 
-    private void updateImage(final String urlDateSuffix) {
+    private void drawSelected(final String urlDateSuffix) {
         ImageInfo imageInfo = retrieveImageInfo(urlDateSuffix);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        wipeContext(gc);
         if (imageInfo != null) {
-            int height = imageInfo.getHeight();
-            int width = imageInfo.getWidth();
-            try {
-                gc.drawImage(
-                        new Image(new URL(imageInfo.getSrc()).openConnection().getInputStream()),
-                        PADDING,
-                        PADDING,
-                        width + PADDING,
-                        height + PADDING);
-            } catch (IOException e) {
-                drawError(gc, "Error fetching image", e.toString());
-            }
+            updateSize(canvas, imageInfo.getHeight(), imageInfo.getWidth());
+            drawImage(gc, imageInfo);
         } else {
             drawError(gc, "Error fetching image info");
+        }
+    }
+
+    private void wipeContext(GraphicsContext gc) {
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    }
+
+    private void drawImage(GraphicsContext gc, ImageInfo imageInfo) {
+        try {
+            gc.drawImage(
+                    new Image(new URL(imageInfo.getSrc()).openConnection().getInputStream()),
+                    PADDING,
+                    PADDING,
+                    imageInfo.getWidth() + PADDING,
+                    imageInfo.getHeight() + PADDING);
+        } catch (IOException e) {
+            drawError(gc, "Error fetching image", e.toString());
+        }
+    }
+
+    private void updateSize(Canvas canvas, int height, int width) {
+        if (canvas.getHeight() < height + 2 * PADDING) {
+            canvas.setHeight(height + 2 * PADDING);
+        }
+        if (canvas.getWidth() < width + 2 * PADDING) {
+            canvas.setWidth(width + 2 * PADDING);
         }
     }
 

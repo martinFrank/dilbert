@@ -38,7 +38,7 @@ class DilbertPageUtil {
                 }
             }
         } catch (IOException | NumberFormatException e) {
-            //e.printStackTrace();
+            //in case of error return null
         }
         return null;
     }

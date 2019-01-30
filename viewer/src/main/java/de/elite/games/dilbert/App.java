@@ -42,9 +42,7 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Hello World!");
 
-        datePicker.setOnAction(event -> {
-            updateImage(getUrlDateSuffix(datePicker.getValue()));
-        });
+        datePicker.setOnAction(event -> updateImage(getUrlDateSuffix(datePicker.getValue())));
         datePicker.setValue(LocalDate.now());
         datePicker.fireEvent(new ActionEvent());
 

@@ -8,6 +8,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -25,15 +26,14 @@ import static de.elite.games.dilbert.DilbertPageUtil.retrieveImageInfo;
 public class App extends Application {
 
     private static final int PADDING = 20;
-    private static final int CANVAS_WIDTH = 900 + 2 * PADDING;
-    private static final int CANVAS_HEIGHT = 480 + 2 * PADDING;
     private static final int ERROR_MSG_X = 150;
     private static final int ERROR_MSG_Y = 100;
     private static final String PREV = "<-";
     private static final String NEXT = "->";
     private static final String WINDOW_TITLE = "Dilbert WebComic Viewer";
     private final DatePicker datePicker = new DatePicker();
-    private final Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+    private final Canvas canvas = new Canvas();
+    private final Color BACKGROUND = Color.rgb(244, 244, 244);
 
     public static void main(String[] args) {
         launch(args);
@@ -58,7 +58,8 @@ public class App extends Application {
         BorderPane border = new BorderPane();
         border.setPadding(new Insets(PADDING, PADDING, PADDING, PADDING));
         border.setTop(hBox);
-        border.setCenter(canvas);
+        ScrollPane scroller = new ScrollPane(canvas);
+        border.setCenter(scroller);
         primaryStage.setScene(new Scene(border));
         primaryStage.show();
     }
@@ -80,7 +81,8 @@ public class App extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         wipeContext(gc);
         if (imageInfo != null) {
-            updateSize(canvas, imageInfo.getHeight(), imageInfo.getWidth());
+            canvas.setWidth(imageInfo.getWidth() + 2 * PADDING);
+            canvas.setHeight(imageInfo.getHeight() + 2 * PADDING);
             drawImage(gc, imageInfo);
         } else {
             drawError(gc, "Error fetching image info");
@@ -88,7 +90,7 @@ public class App extends Application {
     }
 
     private void wipeContext(GraphicsContext gc) {
-        gc.setFill(Color.WHITE);
+        gc.setFill(BACKGROUND);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
@@ -102,15 +104,6 @@ public class App extends Application {
                     imageInfo.getHeight() + PADDING);
         } catch (IOException e) {
             drawError(gc, "Error fetching image", e.toString());
-        }
-    }
-
-    private void updateSize(Canvas canvas, int height, int width) {
-        if (canvas.getHeight() < height + 2 * PADDING) {
-            canvas.setHeight(height + 2 * PADDING);
-        }
-        if (canvas.getWidth() < width + 2 * PADDING) {
-            canvas.setWidth(width + 2 * PADDING);
         }
     }
 

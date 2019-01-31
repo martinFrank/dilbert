@@ -83,4 +83,8 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <build>
+
+    </build>
 </project>

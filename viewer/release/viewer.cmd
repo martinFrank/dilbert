@@ -1,0 +1,1 @@
+javaw -jar viewer-1.0-SNAPSHOT.jar

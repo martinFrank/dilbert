@@ -77,7 +77,17 @@ public class App extends Application {
     }
 
     private void drawSelected(final String urlDateSuffix) {
-        ImageInfo imageInfo = retrieveImageInfo(urlDateSuffix);
+        Runnable r = () -> {
+            ImageInfo imageInfo = retrieveImageInfo(urlDateSuffix);
+            updateImage(imageInfo);
+        };
+        Thread t = new Thread(r);
+        t.setDaemon(true);
+        t.start();
+
+    }
+
+    private void updateImage(ImageInfo imageInfo) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         wipeContext(gc);
         if (imageInfo != null) {
